@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import { useReducer } from "react";
 import Navbar from "./Components/Navbar";
 import News from "./Components/News";
 import {
@@ -12,8 +12,10 @@ export default function App() {
 
   return (
     <CategoryContext.Provider value={{ state, dispatch }}>
-      <Navbar title="MyNews App" />
-      <News />
+      <HashRouter>
+        <Navbar title="MyNews App" />
+        <News />
+      </HashRouter>
     </CategoryContext.Provider>
   );
 }
