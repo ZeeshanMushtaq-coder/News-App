@@ -1,0 +1,1 @@
+.news-card{height:480px;display:flex;flex-direction:column;overflow:hidden}.news-card img{height:180px;object-fit:cover}@media(min-width:565px)and (max-width:776px){.news-card{height:580px}.news-card img{height:220px}}
