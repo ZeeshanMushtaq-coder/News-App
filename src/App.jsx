@@ -1,3 +1,4 @@
+import { HashRouter } from "react-router-dom";
 import { useReducer } from "react";
 import Navbar from "./Components/Navbar";
 import News from "./Components/News";
