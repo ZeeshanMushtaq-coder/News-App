@@ -1,10 +1,12 @@
-import { useContext, useEffect, useState, useMemo } from "react";
+import { useContext, useEffect, useState, useMemo, useCallback } from "react";
 import NewsItem from "./NewsItem";
 import { CategoryContext } from "../context/CategoryContext";
 
 const PAGE_SIZE = 20;
 const MAX_RESULTS = 100;
-const API_KEY = "8f78683d52ea490ebf4bb22859c689dd";
+
+// 🔴 CHANGE 1: Currents API key
+const API_KEY = "sso3m1tcq1-ltUicK3SIkFkBzlULoA9OewVTZN9-pf8Y5e4b";
 
 export default function News() {
   const { state } = useContext(CategoryContext);
@@ -13,44 +15,44 @@ export default function News() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalResults, setTotalResults] = useState(0);
 
-  const fetchNews = async (pageNum, category) => {
+  // 🔴 CHANGE 2: API function updated
+  const fetchNews = useCallback(async (pageNum, category) => {
     try {
       setLoading(true);
+
       const res = await fetch(
-        `https://newsapi.org/v2/top-headlines?country=us&category=${category}&apiKey=${API_KEY}&page=${pageNum}&pageSize=${PAGE_SIZE}`
+        `https://api.currentsapi.services/v1/latest-news?category=${category}&language=en&page_number=${pageNum}&page_size=${PAGE_SIZE}&apiKey=${API_KEY}`
       );
+
       const data = await res.json();
-      setArticles(data.articles || []);
+
+      setArticles(data.news || []);
       setPage(pageNum);
-      setTotalResults(data.totalResults || 0);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching news:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
+  // 🔴 CHANGE 3: useEffect remains same
   useEffect(() => {
     fetchNews(1, category);
-  }, [category]);
+  }, [category, fetchNews]);
 
   const handlePrevious = () => {
     if (page > 1) fetchNews(page - 1, category);
   };
 
   const handleNext = () => {
-    const totalPages = Math.ceil(
-      Math.min(totalResults, MAX_RESULTS) / PAGE_SIZE
-    );
-    if (page < totalPages) fetchNews(page + 1, category);
+    if (page * PAGE_SIZE < MAX_RESULTS) {
+      fetchNews(page + 1, category);
+    }
   };
 
-  const totalPages = useMemo(
-    () => Math.ceil(Math.min(totalResults, MAX_RESULTS) / PAGE_SIZE),
-    [totalResults]
-  );
+  // 🔴 CHANGE 4: total pages logic simplified
+  const totalPages = useMemo(() => Math.ceil(MAX_RESULTS / PAGE_SIZE), []);
 
   return (
     <div className="container mt-5">
@@ -66,9 +68,7 @@ export default function News() {
 
       <div className="row">
         {!loading &&
-          articles.map((article) => (
-            <NewsItem key={article.url} {...article} />
-          ))}
+          articles.map((article) => <NewsItem key={article.id} {...article} />)}
       </div>
 
       <div className="d-flex justify-content-between align-items-center my-3">
@@ -79,14 +79,12 @@ export default function News() {
         >
           &larr; Previous
         </button>
+
         <span>
-          Page <strong>{page}</strong> of <strong>{totalPages}</strong>
+          Page <strong>{page}</strong>
         </span>
-        <button
-          className="btn btn-info"
-          onClick={handleNext}
-          disabled={page >= totalPages}
-        >
+
+        <button className="btn btn-info" onClick={handleNext}>
           Next &rarr;
         </button>
       </div>

@@ -14,9 +14,9 @@ function Navbar({ title }) {
   return (
     <nav className="navbar navbar-light bg-light shadow-sm mb-3">
       <div className="container d-flex justify-content-between align-items-center">
-        <a className="navbar-brand fw-bold" href="#">
+        <span className="navbar-brand fw-bold">
           {title}
-        </a>
+        </span>
         <select
           className="form-select w-auto"
           value={state.category}
